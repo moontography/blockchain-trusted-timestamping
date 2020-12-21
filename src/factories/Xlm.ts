@@ -55,7 +55,7 @@ export default function Xlm(
 
     // modeled off the code written here:
     // https://www.stellar.org/developers/js-stellar-sdk/reference/examples.html#creating-a-payment-transaction
-    async txn(dataSha256Hash: string) {
+    async txn(dataSha256Hash: string, targetPubKey: string) {
       const sourceKeypair = StellarSdk.Keypair.fromSecret(this.secretSeed)
       const sourcePublicKey = sourceKeypair.publicKey()
 
@@ -70,8 +70,7 @@ export default function Xlm(
       })
         .addOperation(
           StellarSdk.Operation.payment({
-            destination:
-              'GACH6YMYFZ574FSGCV7IJXTGETEQL3DLQK64Z6DFGD57PZL5RH6LYOJT',
+            destination: targetPubKey,
             // Because Stellar allows transaction in many currencies, you must
             // specify the asset type. The special "native" asset represents XLM.
             asset: StellarSdk.Asset.native(),
@@ -101,6 +100,5 @@ export async function getXlmPerUsdAmount(
       data: { amount },
     },
   } = await axios.get('https://api.coinbase.com/v2/prices/XLM-USD/buy')
-  console.log('AMOUNT', new BigNumber(usd).div(amount).toFixed(7))
   return new BigNumber(usd).div(amount).toFixed(7)
 }

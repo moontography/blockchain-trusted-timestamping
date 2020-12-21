@@ -1,6 +1,15 @@
 # xlmfile
 
-## Project setup
+## Deploy
+
+This site is hosted in AWS S3 at the time of writing.
+
+```sh
+$ npm run build
+$ aws s3 cp --recursive dist s3://xlmfile.com
+```
+
+## Project setup (from Vue CLI)
 
 ```
 npm install

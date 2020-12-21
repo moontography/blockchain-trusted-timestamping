@@ -7,10 +7,14 @@
           href="https://developers.stellar.org/docs/tutorials/create-account/#create-a-keypair"
           target="_blank"
           rel="noopener noreferrer") (i)
-    input.input-block(
-      :id="`secret-seed-${_uid}`"
-      type="text"
-      v-model="xlmSeed")
+    div.row
+      div.col-11
+        input.input-block(
+          :id="`secret-seed-${_uid}`"
+          :type="inputType"
+          v-model="xlmSeed")
+      div.col-1.text-center
+        a(style="cursor:pointer" @click="toggleType") (show)
 </template>
 
 <script lang="ts">
@@ -19,6 +23,12 @@
 
   export default Vue.extend({
     name: 'SecretSeed',
+
+    data() {
+      return {
+        inputType: 'password',
+      }
+    },
 
     computed: {
       xlmSeed: {
@@ -31,6 +41,12 @@
           this.$store.commit('SET_SECRET_SEED', newSeed)
           localStorage.xlmSeed = newSeed
         },
+      },
+    },
+
+    methods: {
+      toggleType() {
+        this.inputType = this.inputType === 'text' ? 'password' : 'text'
       },
     },
   })
