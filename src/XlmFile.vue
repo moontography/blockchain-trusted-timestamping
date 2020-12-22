@@ -2,34 +2,18 @@
   div#xlmfile
     div.row
       div.col-12.md-5
-        div.row.flex-center(v-if="error")
-          div.col-12
-            div.alert.alert-danger {{ error.stack }}
-        div.row.flex-center(v-else-if="success")
-          div.col-12
-            div.alert.alert-success
-              | Successfully sent file hash to blockchain!
-              | #[a(target="_blank" :href="`https://stellar.expert/explorer/public/tx/${txn.id}`") Click here]
-              | to review transaction: {{ txn.id }}
-        div.row.flex-center
-          div.col.col-fill
-            div.text-center(v-if="file.hash")
-              table.no-border
-                tbody
-                  tr
-                    td.text-right File:
-                    td.text-left
-                      strong {{ file.name }}
-                  tr
-                    td.text-right
-                      a(
-                        href="https://en.wikipedia.org/wiki/SHA-2"
-                        target="_blank"
-                        rel="noopener noreferrer") Hash:
-                    td.text-left
-                      strong {{ getMemoString }}
-              button.btn-primary.btn-small(@click="resetFile") Upload Another File
-            div(v-else)
+        div.sticky-card
+          div.row.flex-center(v-if="error")
+            div.col-12
+              div.alert.alert-danger {{ error.stack }}
+          div.row.flex-center(v-else-if="success")
+            div.col-12
+              div.alert.alert-success
+                | Successfully sent file hash to blockchain!
+                | #[a(target="_blank" :href="`https://stellar.expert/explorer/public/tx/${txn.id}`") Click here]
+                | to review transaction: {{ txn.id }}
+          div.row.flex-center
+            div.col.col-fill
               div.form-group
                 a(
                   href="https://github.com/whatl3y/xlmfile"
@@ -39,30 +23,47 @@
                       alt="Github"
                       style="max-width: 40px; margin: 0px auto;"
                       src="./assets/github.png")
-              div.form-group
-                label(for="hash-file")
-                  | Select the file you want to hash on the Stellar blockchain:
-                input#hash-file.input-block(
-                  type="file"
-                  @change="hashFile")
-        div.row.flex-center
-          div.col.col-fill
-            secret-seed
-        div.row.flex-center
-          div.col
-            div.alert.alert-primary(v-if="isLoading")
-              | Creating transaction now, sit tight for a couple seconds...
-            button.btn-success(
-              v-else
-              :disabled="!(xlmSecretSeed && file.hash)"
-              @click="sendTxn")
-                div Send File Hash to Stellar Blockchain
-                div
-                  small
+              div.text-center(v-if="file.hash")
+                table.no-border
+                  tbody
+                    tr
+                      td.text-right File:
+                      td.text-left
+                        strong {{ file.name }}
+                    tr
+                      td.text-right
+                        a(
+                          href="https://en.wikipedia.org/wiki/SHA-2"
+                          target="_blank"
+                          rel="noopener noreferrer") Hash:
+                      td.text-left
+                        strong {{ getMemoString }}
+                button.btn-primary.btn-small(@click="resetFile") Upload Another File
+              div(v-else)
+                div.form-group
+                  label(for="hash-file")
+                    | Select the file you want to hash on the Stellar blockchain:
+                  input#hash-file.input-block(
+                    type="file"
+                    @change="hashFile")
+          div.row.flex-center
+            div.col.col-fill
+              secret-seed
+          div.row.flex-center
+            div.col
+              div.alert.alert-primary(v-if="isLoading")
+                | Creating transaction now, sit tight for a couple seconds...
+              button.btn-success(
+                v-else
+                :disabled="!(xlmSecretSeed && file.hash)"
+                @click="sendTxn")
+                  div Send File Hash to Stellar Blockchain
+                  div
                     small
-                      | This will send ${{ usdToSend }} USD (~{{ getXlmThatWillBeSent }} XLM)
-                      | from your account to ours to keep the lights on. Your file hash
-                      | will be stored in that transaction in the memo.
+                      small
+                        | This will send ${{ usdToSend }} USD (~{{ getXlmThatWillBeSent }} XLM)
+                        | from your account to ours to keep the lights on. Your file hash
+                        | will be stored in that transaction in the memo.
       div.col-12.md-7
         div.paper.container.container-lg
           div.row.flex-center
@@ -126,8 +127,18 @@
         txn: null,
         getXlmThatWillBeSent: null,
         isLoading: false,
+      }
+    },
 
-        faqs: [
+    computed: {
+      ...mapState({
+        xlmPublicKey: (state) => state.xlmPublicKey,
+        xlmSecretSeed: (state) => state.xlmSecretSeed,
+        usdToSend: (state) => state.usdToSend,
+      }),
+
+      faqs() {
+        return [
           {
             question: 'How does this work?',
             answerHtml: `
@@ -143,7 +154,7 @@
                 <li>
                   Add the private key of an account on the Stellar blockchain that will be
                   used to create a transaction with the file data signature located in the memo
-                  of the transaction. This account should have at least ${this.usdToSend}USD worth of XLM
+                  of the transaction. This account should have at least $${this.usdToSend}USD worth of XLM
                   in it in order to execute the transaction.
                 </li>
                 <li>
@@ -208,16 +219,8 @@
             </p>
           `,
           },
-        ],
-      }
-    },
-
-    computed: {
-      ...mapState({
-        xlmPublicKey: (state) => state.xlmPublicKey,
-        xlmSecretSeed: (state) => state.xlmSecretSeed,
-        usdToSend: (state) => state.usdToSend,
-      }),
+        ]
+      },
 
       getMemoString() {
         if (!this.file.hash) return null
@@ -301,5 +304,12 @@
 
   .m-0 {
     margin: 0px !important;
+  }
+
+  @media (min-width: 992px) {
+    .sticky-card {
+      position: sticky;
+      top: 0px;
+    }
   }
 </style>
