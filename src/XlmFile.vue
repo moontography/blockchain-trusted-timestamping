@@ -1,7 +1,7 @@
 <template lang="pug">
   div#xlmfile
     div.row
-      div.col-12.md-4
+      div.col-12.md-5
         div.row.flex-center(v-if="error")
           div.col-12
             div.alert.alert-danger {{ error.stack }}
@@ -31,6 +31,15 @@
               button.btn-primary.btn-small(@click="resetFile") Upload Another File
             div(v-else)
               div.form-group
+                a(
+                  href="https://github.com/whatl3y/xlmfile"
+                  target="_blank"
+                  rel="noopener noreferrer")
+                    img.no-border(
+                      alt="Github"
+                      style="max-width: 40px; margin: 0px auto;"
+                      src="./assets/github.png")
+              div.form-group
                 label(for="hash-file")
                   | Select the file you want to hash on the Stellar blockchain:
                 input#hash-file.input-block(
@@ -41,16 +50,26 @@
             secret-seed
         div.row.flex-center
           div.col
+            div.alert.alert-primary(v-if="isLoading")
+              | Creating transaction now, sit tight for a couple seconds...
             button.btn-success(
+              v-else
               :disabled="!(xlmSecretSeed && file.hash)"
-              @click="sendTxn") Send File Hash to Stellar Blockchain
-      div.col-12.md-8
+              @click="sendTxn")
+                div Send File Hash to Stellar Blockchain
+                div
+                  small
+                    small
+                      | This will send ${{ usdToSend }} USD (~{{ getXlmThatWillBeSent }} XLM)
+                      | from your account to ours to keep the lights on. Your file hash
+                      | will be stored in that transaction in the memo.
+      div.col-12.md-7
         div.paper.container.container-lg
           div.row.flex-center
             div.col
               img.no-border(
                 alt="Vue logo"
-                style="max-width: 200px;"
+                style="max-width: 200px; margin: 0px auto;"
                 src="./assets/logo.png")
           div.row.flex-center
             div.col
@@ -94,7 +113,7 @@
   import Faq from './components/Faq.vue'
   import SecretSeed from './components/SecretSeed.vue'
   import FileUtils from './factories/FileUtils'
-  import Xlm from './factories/Xlm'
+  import Xlm, { getXlmPerUsdAmount } from './factories/Xlm'
 
   export default Vue.extend({
     name: 'XlmFile',
@@ -105,6 +124,8 @@
         success: false,
         file: getEmptyFile(),
         txn: null,
+        getXlmThatWillBeSent: null,
+        isLoading: false,
 
         faqs: [
           {
@@ -122,7 +143,7 @@
                 <li>
                   Add the private key of an account on the Stellar blockchain that will be
                   used to create a transaction with the file data signature located in the memo
-                  of the transaction. This account should have at least $0.50USD worth of XLM
+                  of the transaction. This account should have at least ${this.usdToSend}USD worth of XLM
                   in it in order to execute the transaction.
                 </li>
                 <li>
@@ -137,14 +158,14 @@
             question: 'Is there any cost associated with using this?',
             answerHtml: `
             <p>
-              The short answer is no, there is no cost if you want to put in a little effort
-              to host this app yourself. You are welcome to fork and run locally or
+              There is no cost if you want to put in a little effort
+              to host xlmfile app yourself. You are welcome to fork and run locally or
               host it yourself online and use with your own public key target account and the
               only cost would be the associated transaction fees on the stellar network (which are VERY small).
               If you want to use this app hosted here (without hosting yourself) 
-              we ask for $0.50 (USD) per file hash stored on the blockchain. Therefore, the private key
+              we ask for $${this.usdToSend} (USD) per file hash stored on the blockchain. Therefore, the private key
               you enter to execute the transaction on the blockchain with the file hash in the memo
-              should have $0.50USD worth of XLM in it in order for the transaction to execute.
+              should have $${this.usdToSend} USD worth of XLM in it in order for the transaction to execute.
             </p>
           `,
           },
@@ -169,10 +190,10 @@
             question: 'Is my private key/secret seed safe?',
             answerHtml: `
             <p>
-              As long as your computer is secure, the short answer is yes.
+              As long as your computer is secure, then yes.
               There are no servers associated with xlmfile and we use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">local storage</a>
               to store your private key so you don't have to enter it every time you upload a file.
-              For the non technical, this just means the file is stored on your computer file system,
+              For the non technical, this just means the key is stored on your computer file system,
               and is not stored anywhere on the internet.
             </p>`,
           },
@@ -180,7 +201,7 @@
             question: `I still don't trust you, but I want to use this tool. What do I do?`,
             answerHtml: `
             <p>
-              I absolutely don't blame you since I don't even trust myself half of the time. If
+              I don't blame you since I don't even trust myself half of the time. If
               you want to use this tool as a standalone utility feel free to fork it and
               enter your own public or private keys on your own machines in the tool. I'm not a hacker
               or a malicious person, just a dad of a 7 month old and 2 cats and a fan of the stellar blockchain :)
@@ -195,6 +216,7 @@
       ...mapState({
         xlmPublicKey: (state) => state.xlmPublicKey,
         xlmSecretSeed: (state) => state.xlmSecretSeed,
+        usdToSend: (state) => state.usdToSend,
       }),
 
       getMemoString() {
@@ -224,6 +246,7 @@
 
       async sendTxn() {
         try {
+          this.isLoading = true
           this.success = false
           if (!this.xlmSecretSeed)
             throw new Error(
@@ -243,8 +266,14 @@
         } catch (err) {
           console.error(err)
           this.error = err
+        } finally {
+          this.isLoading = false
         }
       },
+    },
+
+    async created() {
+      this.getXlmThatWillBeSent = await getXlmPerUsdAmount(this.usdToSend)
     },
 
     components: {

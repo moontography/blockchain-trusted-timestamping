@@ -55,7 +55,11 @@ export default function Xlm(
 
     // modeled off the code written here:
     // https://www.stellar.org/developers/js-stellar-sdk/reference/examples.html#creating-a-payment-transaction
-    async txn(dataSha256Hash: string, targetPubKey: string) {
+    async txn(
+      dataSha256Hash: string,
+      targetPubKey: string,
+      amountUsdToSend: number = 0.5
+    ) {
       const sourceKeypair = StellarSdk.Keypair.fromSecret(this.secretSeed)
       const sourcePublicKey = sourceKeypair.publicKey()
 
@@ -74,7 +78,7 @@ export default function Xlm(
             // Because Stellar allows transaction in many currencies, you must
             // specify the asset type. The special "native" asset represents XLM.
             asset: StellarSdk.Asset.native(),
-            amount: await getXlmPerUsdAmount(0.5), // want to send $0.50 USD worth of XLM to target account
+            amount: await getXlmPerUsdAmount(amountUsdToSend), // want to send $0.50 USD worth of XLM to target account
           })
         )
         // Make this transaction valid for the next 30 seconds only
