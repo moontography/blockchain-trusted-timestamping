@@ -1,5 +1,5 @@
 <template lang="pug">
-  div#xlmfile
+  div#blockchain-file-timestamping
     div.row
       div.col-12.md-5
         div.sticky-card
@@ -16,7 +16,7 @@
             div.col.col-fill
               div.form-group
                 a(
-                  href="https://github.com/whatl3y/xlmfile"
+                  href="https://github.com/moontography/blockchain-file-timestamping"
                   target="_blank"
                   rel="noopener noreferrer")
                     img.no-border(
@@ -74,7 +74,7 @@
                 src="./assets/logo.png")
           div.row.flex-center
             div.col
-              h2.text-center(style="margin: 0.5rem 0rem 1rem 0rem;") Stellar Blockchain File Hashing
+              h2.text-center(style="margin: 0.5rem 0rem 1rem 0rem;") Blockchain File Timestamping
           div.row.flex-center
             div.col
               h4.m-0.text-center What is this?
@@ -117,7 +117,7 @@
   import Xlm, { getXlmPerUsdAmount } from './factories/Xlm'
 
   export default Vue.extend({
-    name: 'XlmFile',
+    name: 'BlockchainFileTimestamping',
 
     data() {
       return {
@@ -170,7 +170,7 @@
             answerHtml: `
             <p>
               There is no cost if you want to put in a little effort
-              to host xlmfile app yourself. You are welcome to fork and run locally or
+              to host blockchain-file-timestamping app yourself. You are welcome to fork and run locally or
               host it yourself online and use with your own public key target account and the
               only cost would be the associated transaction fees on the stellar network (which are VERY small).
               If you want to use this app hosted here (without hosting yourself) 
@@ -202,7 +202,7 @@
             answerHtml: `
             <p>
               As long as your computer is secure, then yes.
-              There are no servers associated with xlmfile and we use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">local storage</a>
+              There are no servers associated with blockchain-file-timestamping and we use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">local storage</a>
               to store your private key so you don't have to enter it every time you upload a file.
               For the non technical, this just means the key is stored on your computer file system,
               and is not stored anywhere on the internet.
@@ -294,6 +294,14 @@
 </script>
 
 <style lang="scss">
+  body {
+    font-family: Arial, sans-serif !important;
+
+    * {
+      font-family: Arial, sans-serif !important;
+    }
+  }
+
   table {
     &.no-border {
       td {

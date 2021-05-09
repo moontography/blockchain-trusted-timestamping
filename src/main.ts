@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import store from './vuex/store'
-import XlmFile from './XlmFile.vue'
+import BlockchainFileTimestamping from './BlockchainFileTimestamping.vue'
 
 import 'papercss'
 
 Vue.config.productionTip = false
 
 new Vue({
-  render: (h) => h(XlmFile),
+  render: (h) => h(BlockchainFileTimestamping),
   store,
 }).$mount('#app')

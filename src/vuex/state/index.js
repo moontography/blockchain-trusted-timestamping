@@ -1,5 +1,5 @@
 export default {
   xlmPublicKey: 'GACH6YMYFZ574FSGCV7IJXTGETEQL3DLQK64Z6DFGD57PZL5RH6LYOJT',
   xlmSecretSeed: localStorage.xlmSeed || null,
-  usdToSend: '0.50',
+  usdToSend: '2.00',
 }
