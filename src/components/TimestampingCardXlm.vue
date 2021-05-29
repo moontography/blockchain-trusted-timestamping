@@ -1,0 +1,150 @@
+<template lang="pug">
+  div
+    div.row.flex-center(v-if="error")
+      div.col-12
+        div.alert.alert-danger {{ error.stack }}
+    div.row.flex-center(v-else-if="success")
+      div.col-12
+        div.alert.alert-success
+          | Successfully sent file hash to blockchain!
+          | #[a(target="_blank" :href="`https://stellar.expert/explorer/public/tx/${txn.id}`") Click here]
+          | to review transaction: {{ txn.id }}
+    div.row.flex-center.mb-2
+      div.col.col-fill
+        div.form-group.d-flex.justify-content-center.mb-2
+          img.img-fluid(
+            style="max-width: 25%"
+            src="../assets/stellar.png")
+        div.text-center(v-if="file.hash")
+          table.no-border.mx-auto
+            tbody
+              tr
+                td.mb-2
+                  strong {{ file.name }}
+              tr
+                td
+                  div.d-flex.justify-content-center
+                    div.alert.alert-success.mb-1
+                      small {{ fileHashString }}
+          button.btn.btn-primary.btn-sm(@click="resetFile") Upload Another File
+        div(v-else)
+          div.form-group
+            label(for="hash-file")
+              | Select the file you want to hash on the Stellar blockchain:
+            div.d-flex.justify-content-center
+              input#hash-file.input-block(
+                type="file"
+                @change="hashFile")
+    div.row.flex-center
+      div.col.col-fill
+        secret-seed
+    div.row.flex-center
+      div.col
+        div.alert.alert-primary(v-if="isLoading")
+          | Creating transaction now, sit tight for a couple seconds...
+        button.btn(
+          v-else
+          :class="!(xlmSecretSeed && file.hash) ? 'btn-secondary' : 'btn-success'"
+          :disabled="!(xlmSecretSeed && file.hash)"
+          @click="sendTxn")
+            div Send File Hash to Stellar Blockchain
+            div
+              small
+                small
+                  | This will send ${{ usdToSend }} USD (~{{ getXlmThatWillBeSent }} XLM)
+                  | from your account to ours to keep the lights on. Your file hash
+                  | will be stored in that transaction in the memo.
+</template>
+
+<script>
+  import { mapState } from 'vuex'
+  import FileUtils from '../factories/FileUtils'
+  import Xlm, { getXlmPerUsdAmount } from '../factories/Xlm'
+
+  export default {
+    name: 'TimestampingCardXlm',
+
+    data() {
+      return {
+        error: '',
+        success: false,
+        file: getEmptyFile(),
+        txn: null,
+        getXlmThatWillBeSent: null,
+        isLoading: false,
+      }
+    },
+
+    computed: {
+      ...mapState({
+        xlmPublicKey: (state) => state.xlm.xlmPublicKey,
+        xlmSecretSeed: (state) => state.xlm.xlmSecretSeed,
+        usdToSend: (state) => state.xlm.usdToSend,
+      }),
+
+      fileHashString() {
+        if (!this.file.hash) return null
+        return Xlm()
+          .getStellarHash(this.file.hash)
+          .value.toString('hex')
+      },
+    },
+
+    methods: {
+      resetFile() {
+        this.error = ''
+        this.file = getEmptyFile()
+      },
+
+      async hashFile(evt) {
+        try {
+          const file = evt.target.files[0]
+          this.file = {
+            name: file.name,
+            hash: await FileUtils.sha256(file),
+          }
+        } catch (err) {
+          this.error = err
+        }
+      },
+
+      async sendTxn() {
+        try {
+          this.isLoading = true
+          this.success = false
+          if (!this.xlmSecretSeed)
+            throw new Error(
+              `You need to enter your XLM private key/secret in order to send a transaction.`
+            )
+
+          if (!this.file.hash)
+            throw new Error(
+              `Make sure you upload a file to send it's SHA256 hash to the blockchain.`
+            )
+
+          const transactor = Xlm(this.xlmSecretSeed)
+          const txn = await transactor.txn(this.file.hash, this.xlmPublicKey)
+          this.txn = txn
+          this.error = ''
+          this.success = true
+        } catch (err) {
+          console.error(err)
+          this.error = err
+        } finally {
+          this.isLoading = false
+        }
+      },
+    },
+
+    async created() {
+      this.getXlmThatWillBeSent = await getXlmPerUsdAmount(this.usdToSend)
+    },
+  }
+
+  function getEmptyFile() {
+    return {
+      name: '',
+      hash: '',
+    }
+  }
+</script>

@@ -1,11 +1,14 @@
 <template lang="pug">
-  div.collapsible
-    input(
-      type="checkbox"
-      :id="`collapsible-${_uid}`"
-      name="collapsible")
-    label(:for="`collapsible-${_uid}`") {{ question }}
-    div.collapsible-body(v-html="answerHtml")
+  div
+    h4
+      a.text-dark(
+        style="cursor: pointer"
+        data-toggle="collapse"
+        :data-target="`#collapsible-${_uid}`") {{ question }}
+    div.collapse(:id="`collapsible-${_uid}`")
+      div.card
+        div.card-body
+          div(v-html="answerHtml")
 </template>
 
 <script lang="ts">

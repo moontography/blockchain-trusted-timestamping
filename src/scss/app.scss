@@ -1,0 +1,47 @@
+@import 'bootstrap/scss/bootstrap.scss';
+
+body {
+  font-family: Arial, sans-serif !important;
+
+  * {
+    font-family: Arial, sans-serif !important;
+  }
+}
+
+table {
+  &.no-border {
+    td {
+      border: 0px !important;
+    }
+  }
+}
+
+p {
+  margin-bottom: 0px !important;
+}
+
+.card {
+  -webkit-box-shadow: 0 0.46875rem 2.1875rem rgb(90 97 105 / 10%),
+    0 0.9375rem 1.40625rem rgb(90 97 105 / 10%),
+    0 0.25rem 0.53125rem rgb(90 97 105 / 12%),
+    0 0.125rem 0.1875rem rgb(90 97 105 / 10%);
+  box-shadow: 0 0.46875rem 2.1875rem rgb(90 97 105 / 10%),
+    0 0.9375rem 1.40625rem rgb(90 97 105 / 10%),
+    0 0.25rem 0.53125rem rgb(90 97 105 / 12%),
+    0 0.125rem 0.1875rem rgb(90 97 105 / 10%);
+}
+
+.m-0 {
+  margin: 0px !important;
+}
+
+.rounded {
+  border-radius: 1rem !important;
+}
+
+@media (min-width: 992px) {
+  .sticky-card {
+    position: sticky;
+    top: 0px;
+  }
+}

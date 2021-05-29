@@ -7,14 +7,17 @@
           href="https://developers.stellar.org/docs/tutorials/create-account/#create-a-keypair"
           target="_blank"
           rel="noopener noreferrer") (i)
-    div.row
-      div.col-11
-        input.input-block(
+    div
+      div.input-group
+        input.form-control(
           :id="`secret-seed-${_uid}`"
           :type="inputType"
           v-model="xlmSeed")
-      div.col-1.text-center
-        a(style="cursor:pointer" @click="toggleType") (show)
+        div.input-group-append
+          span.input-group-text
+            a(
+              style="cursor:pointer"
+              @click="toggleType") show
 </template>
 
 <script lang="ts">
@@ -33,12 +36,11 @@
     computed: {
       xlmSeed: {
         get() {
-          return this.$store.state.xlmSecretSeed
+          return this.$store.state.xlm.xlmSecretSeed
         },
 
         set(newSeed) {
-          console.log('GOTHERE', newSeed)
-          this.$store.commit('SET_SECRET_SEED', newSeed)
+          this.$store.commit('SET_XLM_SECRET_SEED', newSeed)
           localStorage.xlmSeed = newSeed
         },
       },

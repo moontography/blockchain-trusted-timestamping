@@ -2,7 +2,10 @@ import Vue from 'vue'
 import store from './vuex/store'
 import BlockchainFileTimestamping from './BlockchainFileTimestamping.vue'
 
-import 'papercss'
+import './components'
+
+import 'bootstrap'
+import './scss/app.scss'
 
 Vue.config.productionTip = false
 
