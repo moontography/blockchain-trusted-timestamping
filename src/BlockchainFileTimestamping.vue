@@ -9,6 +9,23 @@
           div.card.border-0.bg-light.rounded
             div.card-body
               component(:is="blockchainHashComponent")
+        div.col-12.table-reponsive.mt-4
+          table.table.table-striped.table-bordered
+            thead
+              tr
+                th Time
+                th File
+                th File Size
+                th Hash
+            tbody
+              tr(v-if="!hashes || hashes.length === 0")
+                td(colspan="100%")
+                  i No hashes stored yet for your address...
+              tr(v-else v-for="hash in parsedHashes")
+                td {{ hash.time }}
+                td {{ hash.fileName }}
+                td {{ hash.fileSizeBytes }}
+                td {{ hash.dataHash }}
 
         //- div.col-12
         //-   div.row.flex-center
@@ -52,6 +69,7 @@
 
 <script>
   import Vue from 'vue'
+  import dayjs from 'dayjs'
   import { mapState } from 'vuex'
 
   export default Vue.extend({
@@ -61,12 +79,23 @@
       ...mapState({
         activeNetwork: (state) => state.activeNetwork,
         globalError: (state) => state.globalError,
+        hashes: (state) => state.hashes,
       }),
 
       blockchainHashComponent() {
         return this.activeNetwork === 'xlm'
           ? 'timestamping-card-xlm'
           : 'timestamping-card-eth'
+      },
+
+      parsedHashes() {
+        return (
+          this.hashes &&
+          this.hashes.map((h) => ({
+            ...h,
+            time: dayjs(Number(h.time) * 1e3).toISOString(),
+          }))
+        )
       },
     },
 

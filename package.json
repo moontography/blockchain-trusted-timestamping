@@ -17,6 +17,7 @@
     "bignumber.js": "^9.0.1",
     "bootstrap": "^4.5.3",
     "core-js": "^3.6.5",
+    "dayjs": "^1.10.5",
     "stellar-sdk": "^7.0.0",
     "vue": "^2.6.11",
     "vuex": "^3.6.0",

@@ -18,29 +18,21 @@
                     div.alert.alert-success.mb-1
                       small {{ fileHashString }}
           button.btn.btn-primary.btn-sm(@click="resetFile") Upload Another File
-        div(v-else)
-          div.form-group
-            label(for="hash-file")
-              | Select the file you want to hash on the blockchain:
-            div.d-flex.justify-content-center
-              input#hash-file.input-block(
-                type="file"
-                @change="hashFile")
+        div.text-center(v-else)
+          div.mb-1 Select the file you want to hash on the blockchain:
+          input-file-hash(@change="hashFile")
     div.row.flex-center
       div.col.d-flex.justify-content-center
         div.alert.alert-primary(v-if="isLoading")
           | Creating transaction now, sit tight for a couple seconds...
-        button.btn(
-          v-else
-          :class="!file.hash ? 'btn-secondary' : 'btn-success'"
-          :disabled="!file.hash"
+        button.btn.btn-success(
+          v-else-if="file.hash"
           @click="sendTxn")
             div Store File Hash on Blockchain
 </template>
 
 <script>
   import { mapState } from 'vuex'
-  import FileUtils from '../factories/FileUtils'
   import Xlm from '../factories/Xlm'
 
   export default {
@@ -74,17 +66,8 @@
         this.file = getEmptyFile()
       },
 
-      async hashFile(evt) {
-        try {
-          const file = evt.target.files[0]
-          this.file = {
-            name: file.name,
-            size: file.size,
-            hash: await FileUtils.sha256(file),
-          }
-        } catch (err) {
-          this.$store.state('SET_GLOBAL_ERROR', err)
-        }
+      hashFile(fileInfo) {
+        this.file = fileInfo
       },
 
       async sendTxn() {

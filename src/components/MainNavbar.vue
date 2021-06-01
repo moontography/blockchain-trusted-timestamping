@@ -42,21 +42,29 @@
                 alt="Github"
                 style="max-width: 40px; margin: 0px auto;"
                 src="../assets/github.png")
-      user-address
-
+      div(v-if="activeNetwork") {{ activeNetwork.name }}
+      user-address.ml-2
+      div.ml-2(v-if="activeNetwork")
+        a(@click="disconnect")
+          i.far.fa-times-circle.text-danger
 </template>
 
-<script lang="ts">
-  //   import Vue from 'vue'
+<script>
+  import { mapState } from 'vuex'
 
-  //   export default Vue.extend({
-  //     name: 'Faq',
-  //     props: {
-  //       question: { type: String },
-  //       answerHtml: { type: String },
-  //     },
-  //   })
-  //
+  export default {
+    name: 'MainNavbar',
+
+    computed: mapState({
+      activeNetwork: (_, getters) => getters.activeNetwork,
+    }),
+
+    methods: {
+      disconnect() {
+        this.$store.dispatch('disconnect')
+      },
+    },
+  }
 </script>
 
 <style scoped lang="scss">

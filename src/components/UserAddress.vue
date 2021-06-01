@@ -20,8 +20,8 @@
       }),
 
       shortAddy() {
-        const f3 = this.userAddress.slice(0, 4)
-        const l3 = this.userAddress.slice(-5, -1)
+        const f3 = this.userAddress.slice(0, 6)
+        const l3 = this.userAddress.slice(-7, -1)
         return `${f3}...${l3}`
       },
     },

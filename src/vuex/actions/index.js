@@ -4,8 +4,9 @@ import MTGY from '../../factories/web3/MTGY'
 import TrustedTimestamping from '../../factories/web3/TrustedTimestamping'
 
 export default {
-  async init({ commit, dispatch, state }, reset = false) {
+  async init({ commit, dispatch, getters, state }, reset = false) {
     try {
+      commit('SET_GLOBAL_ERROR', null)
       if (state.web3 && state.web3.isConnected && !reset) return
       if (state.activeNetwork === 'xlm') return
 
@@ -22,24 +23,36 @@ export default {
         )
       }
 
+      commit('SET_WEB3_CHAIN_ID', await web3.eth.getChainId())
+      if (!getters.activeNetwork) {
+        throw new Error(
+          `The selected network not supported. Please connect to a supported network, ${state.eth.networks
+            .map((n) => n.name)
+            .join(', ')}`
+        )
+      }
+
       const [accountAddy] = await web3.eth.getAccounts()
       commit('SET_WEB3_USER_ADDRESS', accountAddy)
 
       await dispatch('ethCheckApprovalStatusForTokenContract')
-
-      const trustedTimestampingAddress =
-        state[state.activeNetwork].addresses.trustedTimestamping
-      const ttCont = TrustedTimestamping(web3, trustedTimestampingAddress)
-      const hashes = await ttCont.methods
-        .getHashesFromAddress(accountAddy)
-        .call()
-      console.log('HASHES', hashes)
+      await dispatch('getHashes')
     } catch (err) {
+      console.error(`Error`, err)
       commit('SET_GLOBAL_ERROR', err)
     }
   },
 
-  async ethCheckApprovalStatusForTokenContract({ state, commit }) {
+  disconnect({ commit }) {
+    commit('SET_WEB3_INSTANCE', null)
+    commit('SET_WEB3_IS_CONNECTED', false)
+    commit('SET_WEB3_IS_APPROVED', false)
+    commit('SET_WEB3_CHAIN_ID', null)
+    commit('SET_WEB3_USER_ADDRESS', '')
+    commit('SET_HASHES', [])
+  },
+
+  async ethCheckApprovalStatusForTokenContract({ getters, state, commit }) {
     const userAddy = state.web3.address
     if (!userAddy) {
       commit('SET_WEB3_IS_CONNECTED', false)
@@ -48,9 +61,8 @@ export default {
     }
 
     const web3 = state.web3.instance
-    const mtgyAddress = state[state.activeNetwork].addresses.mtgy
-    const trustedTimestampingAddress =
-      state[state.activeNetwork].addresses.trustedTimestamping
+    const mtgyAddress = getters.activeNetwork.mtgy
+    const trustedTimestampingAddress = getters.activeNetwork.trustedTimestamping
     const contract = MTGY(web3, mtgyAddress)
     const ttCont = TrustedTimestamping(web3, trustedTimestampingAddress)
     const [timestampAllowance, currentCost] = await Promise.all([
@@ -61,13 +73,13 @@ export default {
     commit('SET_WEB3_IS_APPROVED', isApprovedAlready)
   },
 
-  async ethApproveTokenContract({ state, commit }) {
+  async ethApproveTokenContract({ getters, state, commit }) {
     try {
       const web3 = state.web3.instance
       const userAddy = state.web3.address
-      const mtgyAddress = state[state.activeNetwork].addresses.mtgy
+      const mtgyAddress = getters.activeNetwork.mtgy
       const trustedTimestampingAddress =
-        state[state.activeNetwork].addresses.trustedTimestamping
+        getters.activeNetwork.trustedTimestamping
       const mtgyCont = MTGY(web3, mtgyAddress)
       await mtgyCont.methods
         .approve(trustedTimestampingAddress, 5000)
@@ -79,10 +91,9 @@ export default {
     }
   },
 
-  async sendTxn({ state }, { hash, fileName, fileSize }) {
+  async sendTxn({ getters, state }, { hash, fileName, fileSize }) {
     const userAddy = state.web3.address
-    const trustedTimestampingAddress =
-      state[state.activeNetwork].addresses.trustedTimestamping
+    const trustedTimestampingAddress = getters.activeNetwork.trustedTimestamping
     const web3Mod = Web3Modal()
     const web3 = await web3Mod.connect()
     const ttCont = TrustedTimestamping(web3, trustedTimestampingAddress)
@@ -91,5 +102,14 @@ export default {
       .send({ from: userAddy })
 
     // TODO refreshes hashes again
+  },
+
+  async getHashes({ commit, state, getters }) {
+    const web3 = state.web3.instance
+    const userAddy = state.web3.address
+    const trustedTimestampingAddress = getters.activeNetwork.trustedTimestamping
+    const ttCont = TrustedTimestamping(web3, trustedTimestampingAddress)
+    const hashes = await ttCont.methods.getHashesFromAddress(userAddy).call()
+    commit('SET_HASHES', hashes)
   },
 }

@@ -1,6 +1,5 @@
 export default {
-  // routeNamespace(state) {
-  //   // return state.router.currentRoute.fullPath.split('/')[1]
-  //   return state.router.currentRoute.path.split('/')[1]
-  // },
+  activeNetwork(state) {
+    return state.eth.networks.find((n) => n.chain_id === state.web3.chainId)
+  },
 }

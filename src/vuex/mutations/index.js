@@ -11,6 +11,10 @@ export default {
     state.web3.isApproved = isApproved
   },
 
+  SET_WEB3_CHAIN_ID(state, chainId) {
+    state.web3.chainId = chainId
+  },
+
   SET_WEB3_INSTANCE(state, web3) {
     state.web3.instance = web3
   },
@@ -25,5 +29,9 @@ export default {
 
   SET_XLM_SECRET_SEED(state, seed) {
     state.xlm.xlmSecretSeed = seed
+  },
+
+  SET_HASHES(state, hashes) {
+    state.hashes = hashes
   },
 }

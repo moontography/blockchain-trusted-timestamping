@@ -27,14 +27,9 @@
                     div.alert.alert-success.mb-1
                       small {{ fileHashString }}
           button.btn.btn-primary.btn-sm(@click="resetFile") Upload Another File
-        div(v-else)
-          div.form-group
-            label(for="hash-file")
-              | Select the file you want to hash on the Stellar blockchain:
-            div.d-flex.justify-content-center
-              input#hash-file.input-block(
-                type="file"
-                @change="hashFile")
+        div.text-center(v-else)
+          div.mb-1 Select the file you want to hash on the blockchain:
+          input-file-hash(@change="hashFile")
     div.row.flex-center
       div.col.col-fill
         secret-seed
@@ -58,7 +53,6 @@
 
 <script>
   import { mapState } from 'vuex'
-  import FileUtils from '../factories/FileUtils'
   import Xlm, { getXlmPerUsdAmount } from '../factories/Xlm'
 
   export default {
@@ -96,16 +90,8 @@
         this.file = getEmptyFile()
       },
 
-      async hashFile(evt) {
-        try {
-          const file = evt.target.files[0]
-          this.file = {
-            name: file.name,
-            hash: await FileUtils.sha256(file),
-          }
-        } catch (err) {
-          this.error = err
-        }
+      hashFile(fileInfo) {
+        this.file = fileInfo
       },
 
       async sendTxn() {
