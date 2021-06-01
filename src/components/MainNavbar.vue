@@ -33,20 +33,11 @@
       //-   input.form-control.mr-sm-2(type='search' placeholder='Search' aria-label='Search')
       //-   button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Search
       ul.navbar-nav
-        li.nav-item
-          a.nav-link(
-            href="https://github.com/moontography/blockchain-file-timestamping"
-            target="_blank"
-            rel="noopener noreferrer")
-              img.img-fluid(
-                alt="Github"
-                style="max-width: 40px; margin: 0px auto;"
-                src="../assets/github.png")
       div(v-if="activeNetwork") {{ activeNetwork.name }}
       user-address.ml-2
       div.ml-2(v-if="activeNetwork")
         a(@click="disconnect")
-          i.far.fa-times-circle.text-danger
+          i.fas.fa-times-circle.text-danger
 </template>
 
 <script>

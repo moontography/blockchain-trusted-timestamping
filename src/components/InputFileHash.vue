@@ -4,7 +4,8 @@
       :id="`hash-file-${_uid}`"
       type="file"
       @change="hashFile")
-    button.btn.btn-primary(@click="triggerFile") Upload File to Hash
+    button.btn.btn-primary(@click="triggerFile")
+      | #[i.fas.fa-upload] Upload File to Hash
 </template>
 
 <script>

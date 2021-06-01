@@ -1,13 +1,5 @@
 @import 'bootstrap/scss/bootstrap.scss';
 
-body {
-  font-family: Arial, sans-serif !important;
-
-  * {
-    font-family: Arial, sans-serif !important;
-  }
-}
-
 a {
   cursor: pointer;
 }
@@ -47,5 +39,33 @@ p {
   .sticky-card {
     position: sticky;
     top: 0px;
+  }
+}
+
+.modal {
+  .modal-dialog {
+    @media (min-width: 1200px) {
+      &.modal-xl {
+        max-width: 1140px !important;
+      }
+    }
+
+    @media (min-width: 1400px) {
+      &.modal-xl {
+        max-width: 1340px !important;
+      }
+    }
+
+    @media (min-width: 1600px) {
+      &.modal-xl {
+        max-width: 1540px !important;
+      }
+    }
+
+    @media (min-width: 1800px) {
+      &.modal-xl {
+        max-width: 1740px !important;
+      }
+    }
   }
 }
